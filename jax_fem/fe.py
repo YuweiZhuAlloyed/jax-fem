@@ -302,8 +302,10 @@ class FiniteElement:
         # (num_cells, 1, num_nodes, vec) * (1, num_quads, num_nodes, 1) -> (num_cells, num_quads, num_nodes, vec) -> (num_cells, num_quads, vec)
         u = np.sum(cells_sol[:, None, :, :] * self.shape_vals[None, :, :, None], axis=2)
         return u
-
-    def convert_from_dof_to_face_quad(self, sol, boundary_inds):
+    def convert_nodal_phase_to_volume(self, phase : np.ndarray):
+        cells_phase = phase[self.cells]
+        return cells_phase
+    def convert_from_dof_to_face_quad(self, sol, boundary_inds, phase : bool = False):
         """Obtain surface solution from nodal solution
 
         Parameters
@@ -322,7 +324,11 @@ class FiniteElement:
         selected_face_shape_vals = self.face_shape_vals[boundary_inds[:, 1]]  # (num_selected_faces, num_face_quads, num_nodes)
         # (num_selected_faces, 1, num_nodes, vec) * (num_selected_faces, num_face_quads, num_nodes, 1) 
         # -> (num_selected_faces, num_face_quads, vec)
-        u = np.sum(selected_cell_sols[:, None, :, :] * selected_face_shape_vals[:, :, :, None], axis=2)
+        if phase:
+            face_vals = np.ones_like(selected_face_shape_vals[:, :, :, None])
+            u = np.max(selected_cell_sols[:, None, :, :] * face_vals, axis=2)
+        else:
+            u = np.sum(selected_cell_sols[:, None, :, :] * selected_face_shape_vals[:, :, :, None], axis=2)
         return u
 
     def sol_to_grad(self, sol):

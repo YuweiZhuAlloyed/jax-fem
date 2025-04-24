@@ -22,7 +22,7 @@ class Problem:
     dirichlet_bc_info: Optional[List[Union[List[Callable], List[int], List[Callable]]]] = None
     location_fns: Optional[List[Callable]] = None
     additional_info: Any = ()
-
+    debug_mode : bool = False
     def __post_init__(self):
 
         if type(self.mesh) != type([]):
@@ -314,7 +314,7 @@ class Problem:
         """Volume integral in weak form
         """
         vmap_fn = self.kernel_jac if jac_flag else self.kernel
-        num_cuts = 20
+        num_cuts = 1 if self.debug_mode else 20
         if num_cuts > self.num_cells:
             num_cuts = self.num_cells
         batch_size = self.num_cells // num_cuts
