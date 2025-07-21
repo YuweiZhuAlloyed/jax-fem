@@ -1,7 +1,7 @@
 from pyfiglet import Figlet
 
 f = Figlet(font='starwars')
-print(f.renderText('JAX - FEM'))
+print(f.renderText('ALLOYED JAX - FEM'))
 
 from .logger_setup import setup_logger
 # LOGGING
